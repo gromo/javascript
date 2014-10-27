@@ -117,14 +117,14 @@
                     "options": {"type": "indexOf", "values": dateLocale.dayAbbr},
                     "get": function (date) {
                         return this.options.values[date.getDay()] || '';
-                    },
+                    }
                 },
                 "l": {
                     "error": "Incorrect day",
                     "options": {"type": "indexOf", "values": dateLocale.dayFull},
                     "get": function (date) {
                         return this.options.values[date.getDay()] || '';
-                    },
+                    }
                 },
                 "H": {
                     "error": "Incorrect hours in time",
@@ -180,7 +180,7 @@
                     "error": "Incorrect AM/PM value in time",
                     "options": {"length": 2, "type": "indexOf", "values": ["AM", "PM"]},
                     "get": function (date) {
-                        return date.getHours == 0 || date.getHours() > 12 ? 'PM' : 'AM';
+                        return date.getHours() === 0 || date.getHours() > 12 ? 'PM' : 'AM';
                     },
                     "set": function (value, date) {
                         date.pm = value ? true : false;
@@ -190,7 +190,7 @@
                     "error": "Incorrect AM/PM value in time",
                     "options": {"length": 2, "type": "indexOf", "values": ["am", "pm"]},
                     "get": function (date) {
-                        return date.getHours == 0 || date.getHours() > 12 ? 'pm' : 'am';
+                        return date.getHours() === 0 || date.getHours() > 12 ? 'pm' : 'am';
                     },
                     "set": function (value, date) {
                         date.pm = value ? true : false;
@@ -231,20 +231,20 @@
                     o.length = [];
                 }
 
-                var i, v;
+                var i, v, vs;
                 switch (o.type) {
                     case 'indexOf':
                         if (o.values && o.values.length) {
                             v = s.toLowerCase();
                             o.length = [(o.length[0] || 1), (o.length[1] ? Math.min(o.length[1], v.length) : v.length)];
-                            o.values = o.values.map(function (v) {
+                            vs = o.values.slice(0).map(function (v) {
                                 return v.toLowerCase();
                             });
                             for (i = o.length[1]; i >= o.length[0]; i--) {
-                                if (o.values.indexOf(v.substring(0, i)) !== -1) {
+                                if (vs.indexOf(v.substring(0, i)) !== -1) {
                                     return {
                                         "match": s.substring(0, i),
-                                        "value": o.values.indexOf(v.substring(0, i))
+                                        "value": vs.indexOf(v.substring(0, i))
                                     };
                                 }
                             }
@@ -254,14 +254,14 @@
                         if (o.values) {
                             v = s.replace(/^(\d+).*/, '$1');
                             o.length = [(o.length[0] || 1), (o.length[1] ? Math.min(o.length[1], v.length) : v.length)];
-                            o.values = o.values.map(function (v) {
+                            vs = o.values.slice(0).map(function (v) {
                                 return parseInt(v);
                             });
                             for (i = o.length[1]; i >= o.length[0]; i--) {
-                                if (o.values.indexOf(parseInt(v.substring(0, i))) !== -1) {
+                                if (vs.indexOf(parseInt(v.substring(0, i))) !== -1) {
                                     return {
                                         "match": s.substring(0, i),
-                                        "value": o.values.indexOf(parseInt(v.substring(0, i)))
+                                        "value": vs.indexOf(parseInt(v.substring(0, i)))
                                     };
                                 }
                             }
@@ -293,8 +293,8 @@
             /**
              * Parse formatted date
              *
-             * @param {string} date
-             * @param {string} format
+             * @param {string} dateString
+             * @param {string} dateFormat
              * @returns {Date}
              */
             function stringToDate(dateString, dateFormat) {
@@ -417,6 +417,8 @@
         </p>
 
         <script>
+
+
             function e(id) {
                 return document.getElementById(id);
             }
@@ -442,7 +444,7 @@
                     date = stringToDate(date, format);
                     e('result-from-string').innerHTML = date;
                 } catch (error) {
-                    e('result-from-string').innerHTML = '<span style="color:red;">' + error + '</span>';
+                    e('result-from-string').innerHTML = '<span style="color:red;">' + (error.message || error) + '</span>';
                 }
             };
 
@@ -467,9 +469,78 @@
                     date = dateToString(new Date(date), format);
                     e('result-to-string').innerHTML = date;
                 } catch (error) {
-                    e('result-to-string').innerHTML = '<span style="color:red;">' + error + '</span>';
+                    e('result-to-string').innerHTML = '<span style="color:red;">' + (error.message || error) + '</span>';
                 }
             };
+
+
+
+
+
+
+            // hacks for IE < 9 or quirks mode
+            if (!Array.isArray) {
+                Array.isArray = function (arg) {
+                    return Object.prototype.toString.call(arg) === '[object Array]';
+                };
+            }
+            if (!Array.prototype.map) {
+                Array.prototype.map = function (callback, thisArg) {
+                    var T, A, k;
+                    if (this == null) {
+                        throw new TypeError(' this is null or not defined');
+                    }
+                    var O = Object(this);
+                    var len = O.length >>> 0;
+                    if (typeof callback !== 'function') {
+                        throw new TypeError(callback + ' is not a function');
+                    }
+                    if (arguments.length > 1) {
+                        T = thisArg;
+                    }
+                    A = new Array(len);
+                    k = 0;
+                    while (k < len) {
+                        var kValue, mappedValue;
+                        if (k in O) {
+                            kValue = O[k];
+                            mappedValue = callback.call(T, kValue, k, O);
+                            A[k] = mappedValue;
+                        }
+                        k++;
+                    }
+                    return A;
+                };
+            }
+            if (!Array.prototype.indexOf) {
+                Array.prototype.indexOf = function (searchElement, fromIndex) {
+                    var k;
+                    if (this == null) {
+                        throw new TypeError('"this" is null or not defined');
+                    }
+                    var O = Object(this);
+                    var len = O.length >>> 0;
+                    if (len === 0) {
+                        return -1;
+                    }
+                    var n = +fromIndex || 0;
+                    if (Math.abs(n) === Infinity) {
+                        n = 0;
+                    }
+                    if (n >= len) {
+                        return -1;
+                    }
+                    k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+                    while (k < len) {
+                        var kValue;
+                        if (k in O && O[k] === searchElement) {
+                            return k;
+                        }
+                        k++;
+                    }
+                    return -1;
+                };
+            }
         </script>
     </body>
 </html>
