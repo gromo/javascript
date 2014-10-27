@@ -1,0 +1,475 @@
+<html>
+    <head>
+        <title>Formatted dates in JavaScript</title>
+        <style type="text/css">
+            button {
+                width: 80px;
+            }
+            input {
+                width: 200px;
+            }
+            label {
+                display: inline-block;
+                margin-top: 10px;
+                width: 100px;
+            }
+            .format-letters {
+                float: left;
+                margin: 0;
+                width: 400px;
+            }
+            .format-letters label {
+                font-weight: bold;
+                width: 20px;
+            }
+        </style>
+        <script>
+
+            var dateLocale = {
+                "dayAbbr": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                "dayFull": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+                "monthAbbr": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                "monthFull": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            };
+            var formatOptions = {
+                "Y": {
+                    "error": "Incorrect year",
+                    "options": {"length": 4, "type": "int"},
+                    "get": function (date) {
+                        return ('0000' + date.getFullYear()).slice(-4);
+                    },
+                    "set": function (value, date) {
+                        date.year = value;
+                    }
+                },
+                "y": {
+                    "error": "Incorrect year",
+                    "options": {"length": 2, "type": "int"},
+                    "get": function (date) {
+                        return ('00' + date.getFullYear()).slice(-2);
+                    },
+                    "set": function (value, date) {
+                        date.year = (value > 68) ? (value + 1900) : (value + 2000);
+                    }
+                },
+                "m": {
+                    "error": "Incorrect month",
+                    "options": {"length": 2, "type": "int", "values": [1, 12]},
+                    "get": function (date) {
+                        return ('00' + (date.getMonth() + 1)).slice(-2);
+                    },
+                    "set": function (value, date) {
+                        date.month = value - 1;
+                    }
+                },
+                "n": {
+                    "error": "Incorrect month",
+                    "options": {"length": [1, 2], "type": "int", "values": [1, 12]},
+                    "get": function (date) {
+                        return date.getMonth() + 1;
+                    },
+                    "set": function (value, date) {
+                        date.month = value - 1;
+                    }
+                },
+                "F": {
+                    "error": "Incorrect month",
+                    "options": {"type": "indexOf", "values": dateLocale.monthFull},
+                    "get": function (date) {
+                        return this.options.values[date.getMonth()] || '';
+                    },
+                    "set": function (value, date) {
+                        date.month = value;
+                    }
+                },
+                "M": {
+                    "error": "Incorrect month",
+                    "options": {"type": "indexOf", "values": dateLocale.monthAbbr},
+                    "get": function (date) {
+                        return this.options.values[date.getMonth()] || '';
+                    },
+                    "set": function (value, date) {
+                        date.month = value;
+                    }
+                },
+                "d": {
+                    "error": "Incorrect day",
+                    "options": {"length": 2, "type": "int", "values": [1, 31]},
+                    "get": function (date) {
+                        return ('00' + date.getDate()).slice(-2);
+                    },
+                    "set": function (value, date) {
+                        date.date = value;
+                    }
+                },
+                "j": {
+                    "error": "Incorrect day",
+                    "options": {"length": [1, 2], "type": "int", "values": [1, 31]},
+                    "get": function (date) {
+                        return date.getDate();
+                    },
+                    "set": function (value, date) {
+                        date.date = value;
+                    }
+                },
+                "D": {
+                    "error": "Incorrect day",
+                    "options": {"type": "indexOf", "values": dateLocale.dayAbbr},
+                    "get": function (date) {
+                        return this.options.values[date.getDay()] || '';
+                    },
+                },
+                "l": {
+                    "error": "Incorrect day",
+                    "options": {"type": "indexOf", "values": dateLocale.dayFull},
+                    "get": function (date) {
+                        return this.options.values[date.getDay()] || '';
+                    },
+                },
+                "H": {
+                    "error": "Incorrect hours in time",
+                    "options": {"length": 2, "type": "int", "values": [0, 23]},
+                    "get": function (date) {
+                        return ('00' + date.getHours()).slice(-2);
+                    },
+                    "set": function (value, date) {
+                        date.hours = value;
+                    }
+                },
+                "h": {
+                    "error": "Incorrect hours in time",
+                    "options": {"length": 2, "type": "int", "values": [1, 12]},
+                    "get": function (date) {
+                        return ('00' + (date.getHours() % 12 + 1)).slice(-2);
+                    },
+                    "set": function (value, date) {
+                        date.hours = value;
+                    }
+                },
+                "G": {
+                    "error": "Incorrect hours in time",
+                    "options": {"length": [1, 2], "type": "int", "values": [0, 23]},
+                    "get": function (date) {
+                        return date.getHours();
+                    },
+                    "set": function (value, date) {
+                        date.hours = value;
+                    }
+                },
+                "g": {
+                    "error": "Incorrect hours in time",
+                    "options": {"length": [1, 2], "type": "int", "values": [1, 12]},
+                    "get": function (date) {
+                        return date.getHours() % 12;
+                    },
+                    "set": function (value, date) {
+                        date.hours = value;
+                    }
+                },
+                "i": {
+                    "error": "Incorrect minutes in time",
+                    "options": {"length": 2, "type": "int", "values": [0, 59]},
+                    "get": function (date) {
+                        return ('00' + date.getMinutes()).slice(-2);
+                    },
+                    "set": function (value, date) {
+                        date.minutes = value;
+                    }
+                },
+                "A": {
+                    "error": "Incorrect AM/PM value in time",
+                    "options": {"length": 2, "type": "indexOf", "values": ["AM", "PM"]},
+                    "get": function (date) {
+                        return date.getHours == 0 || date.getHours() > 12 ? 'PM' : 'AM';
+                    },
+                    "set": function (value, date) {
+                        date.pm = value ? true : false;
+                    }
+                },
+                "a": {
+                    "error": "Incorrect AM/PM value in time",
+                    "options": {"length": 2, "type": "indexOf", "values": ["am", "pm"]},
+                    "get": function (date) {
+                        return date.getHours == 0 || date.getHours() > 12 ? 'pm' : 'am';
+                    },
+                    "set": function (value, date) {
+                        date.pm = value ? true : false;
+                    }
+                }
+            };
+            /**
+             * Get part of date from string
+             *  o = {
+             *      "length": int or [min, max]
+             *      "re": /^\d{2}/
+             *      "type": "indexOf", "indexOfInts", "int"
+             *      "values": ["Jan","Feb","Mar"...] or [min, max] for type:int
+             *  }
+             * @param {string} s source date string
+             * @param {object} o options
+             * @returns {object} {"match", "value"}
+             */
+            function getDatePart(s, o) {
+                o = o || {};
+                s = s + '';
+                // check against regular expression if set
+                if (o.re && !o.re.test(s)) {
+                    return null;
+                }
+
+                // prepare length
+                if (o.length) {
+                    // is single number
+                    if (!Array.isArray(o.length) || o.length.length === 1) {
+                        o.length = [parseInt(o.length), parseInt(o.length)];
+                    }
+                    // check max > min
+                    if (o.length[1] && (o.length[1] < o.length[0])) {
+                        o.length.sort();
+                    }
+                } else {
+                    o.length = [];
+                }
+
+                var i, v;
+                switch (o.type) {
+                    case 'indexOf':
+                        if (o.values && o.values.length) {
+                            v = s.toLowerCase();
+                            o.length = [(o.length[0] || 1), (o.length[1] ? Math.min(o.length[1], v.length) : v.length)];
+                            o.values = o.values.map(function (v) {
+                                return v.toLowerCase();
+                            });
+                            for (i = o.length[1]; i >= o.length[0]; i--) {
+                                if (o.values.indexOf(v.substring(0, i)) !== -1) {
+                                    return {
+                                        "match": s.substring(0, i),
+                                        "value": o.values.indexOf(v.substring(0, i))
+                                    };
+                                }
+                            }
+                        }
+                        return null;
+                    case 'indexOfInts':
+                        if (o.values) {
+                            v = s.replace(/^(\d+).*/, '$1');
+                            o.length = [(o.length[0] || 1), (o.length[1] ? Math.min(o.length[1], v.length) : v.length)];
+                            o.values = o.values.map(function (v) {
+                                return parseInt(v);
+                            });
+                            for (i = o.length[1]; i >= o.length[0]; i--) {
+                                if (o.values.indexOf(parseInt(v.substring(0, i))) !== -1) {
+                                    return {
+                                        "match": s.substring(0, i),
+                                        "value": o.values.indexOf(parseInt(v.substring(0, i)))
+                                    };
+                                }
+                            }
+                        }
+                        return null;
+                    case 'int':
+                        v = s.replace(/^(\d+).*/, '$1');
+                        for (i = o.length[1] ? Math.min(o.length[1], v.length) : v.length; i >= (o.length[0] || 1); i--) {
+                            v = v.substring(0, i);
+                            if (o.values) {
+                                if (parseInt(v) >= (o.values[0] || 0) && (o.values[1] ? (parseInt(v) <= o.values[1]) : true)) {
+                                    return {
+                                        "match": s.substring(0, i),
+                                        "value": parseInt(v)
+                                    };
+                                }
+                            } else {
+                                return {
+                                    "match": s.substring(0, i),
+                                    "value": parseInt(v)
+                                };
+                            }
+                        }
+                        return null;
+                }
+                return null;
+            }
+
+            /**
+             * Parse formatted date
+             *
+             * @param {string} date
+             * @param {string} format
+             * @returns {Date}
+             */
+            function stringToDate(dateString, dateFormat) {
+
+                var d = new Date(2000, 0, 1);
+                var f = dateFormat.split('');
+                var n, o, p;
+                var v = {
+                    "year": null,
+                    "month": null,
+                    "date": null,
+                    "hours": null,
+                    "minutes": null,
+                    "pm": null
+                };
+                while (f.length) {
+                    n = f.shift();
+                    if (!(o = formatOptions[n])) {
+                        if (n === '\\') {
+                            n = f.shift();
+                        }
+                        o = {
+                            "error": "Incorrect date: unknown character '" + n + "'",
+                            "options": {"length": 1, "type": "indexOf", "values": n ? [n] : []}
+                        };
+                    }
+
+                    if (!(p = getDatePart(dateString, o.options, n))) {
+                        throw (o.error || "Incorrect date");
+                    }
+                    dateString = dateString.substring(p.match.length);
+                    o.set && o.set(p.value, v);
+                }
+
+                // update hours if PM value is set
+                if (v.pm && v.hours != null && v.hours < 12) {
+                    v.hours = (v.hours + 12) % 24;
+                }
+
+                if (v.year != null)
+                    d.setFullYear(v.year);
+                if (v.month != null)
+                    d.setMonth(v.month);
+                if (v.date != null)
+                    d.setDate(v.date);
+                if (v.hours != null)
+                    d.setHours(v.hours);
+                if (v.minutes != null)
+                    d.setMinutes(v.minutes);
+                if ((v.year != null && d.getFullYear() !== v.year)
+                        || (v.month != null && d.getMonth() !== v.month)
+                        || (v.date != null && d.getDate() !== v.date)
+                        || (v.hours != null && d.getHours() !== v.hours)
+                        || (v.minutes != null && d.getMinutes() !== v.minutes)
+                        ) {
+                    throw 'Incorrect date';
+                }
+
+                return d;
+            }
+
+            /**
+             *
+             * @param {Date} date
+             * @param {string} format
+             * @returns {string}
+             */
+            function dateToString(date, dateFormat) {
+
+                var d = '', f = dateFormat.split(''), n, o;
+                while (f.length) {
+                    n = f.shift();
+                    if (o = formatOptions[n]) {
+                        n = o.get(date);
+                    }
+                    if (n == '\\') {
+                        n = f.shift() || '';
+                    }
+                    d += n;
+                }
+                return d;
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Formatted dates in JavaScript</h1>
+        <p><a href="http://php.net/manual/en/function.date.php">Supported format letters</a></p>
+        <p class="format-letters">
+            <label>d</label> - Day of month [01-31] <br/>
+            <label>D</label> - Week day [Mon-Sun] <br/>
+            <label>j</label> - Day of month [1-31] <br/>
+            <label>l</label> - Week day [Monday - Sunday] <br/>
+            <label>F</label> - Month name [January - December] <br/>
+            <label>m</label> - Month number [01-12] <br/>
+            <label>M</label> - Month name [Jan - Dec] <br/>
+            <label>n</label> - Month number [1-12] <br/>
+            <label>Y</label> - Year [0000-9999] <br/>
+            <label>y</label> - Year [00-99] <br/>
+            <label>a</label> - Meridiem [am-pm] <br/>
+            <label>A</label> - Meridiem [AM-PM] <br/>
+            <label>g</label> - Hours [1-12] <br/>
+            <label>G</label> - Hours [0-23] <br/>
+            <label>h</label> - Hours [01-12] <br/>
+            <label>H</label> - Hours [00-23] <br/>
+            <label>i</label> - Minutes [00-59] <br/>
+        </p>
+
+        <h3>Convert from string to date</h3>
+        <p>
+            <label>Date:</label> <input id="date-from-string" value=""> <button id="set-date-from-string">Today</button><br/>
+            <label>Format:</label> <input id="format-from-string" value=""> <button id="convert-date-from-string">Convert</button><br/>
+            <label>Result (ISO):</label> <span id="result-from-string"></span>
+        </p>
+
+        <h3>Convert from date to string</h3>
+        <p>
+            <label>Date (ISO):</label> <input id="date-to-string" value=""> <button id="set-date-to-string">Today</button><br/>
+            <label>Format:</label> <input id="format-to-string" value=""> <button id="convert-date-to-string">Convert</button><br/>
+            <label>Result:</label> <span id="result-to-string"></span>
+        </p>
+
+        <script>
+            function e(id) {
+                return document.getElementById(id);
+            }
+
+            e('set-date-from-string').onclick = function () {
+                if (!e('format-from-string').value) {
+                    e('format-from-string').value = 'F j, Y H:i';
+                }
+                e('date-from-string').value = dateToString(new Date(), e('format-from-string').value);
+            };
+            e('convert-date-from-string').onclick = function () {
+                try {
+                    var date = e('date-from-string').value;
+                    if (!date.replace(/^\s+|\s+$/g, '')) {
+                        throw "Date field is empty";
+                    }
+
+                    var format = e('format-from-string').value;
+                    if (!format.replace(/^\s+|\s+$/g, '')) {
+                        throw "Format field is empty";
+                    }
+
+                    date = stringToDate(date, format);
+                    e('result-from-string').innerHTML = date;
+                } catch (error) {
+                    e('result-from-string').innerHTML = '<span style="color:red;">' + error + '</span>';
+                }
+            };
+
+            e('set-date-to-string').onclick = function () {
+                if (!e('format-to-string').value) {
+                    e('format-to-string').value = 'F j, Y H:i';
+                }
+                e('date-to-string').value = dateToString(new Date(), e('format-to-string').value);
+            };
+            e('convert-date-to-string').onclick = function () {
+                try {
+                    var date = e('date-to-string').value;
+                    if (!date.replace(/^\s+|\s+$/g, '')) {
+                        throw "Date field is empty";
+                    }
+
+                    var format = e('format-to-string').value;
+                    if (!format.replace(/^\s+|\s+$/g, '')) {
+                        throw "Format field is empty";
+                    }
+
+                    date = dateToString(new Date(date), format);
+                    e('result-to-string').innerHTML = date;
+                } catch (error) {
+                    e('result-to-string').innerHTML = '<span style="color:red;">' + error + '</span>';
+                }
+            };
+        </script>
+    </body>
+</html>
