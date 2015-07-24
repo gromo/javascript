@@ -1,0 +1,249 @@
+<div class="row">
+    <div class="col-md-2">
+        <h1 class="text-uppercase text-center">CHART TYPE:</h1>
+    </div>
+    <div class="col-md-10">
+        <ul class="charts-list">
+            <li ng-repeat="chart in charts" ng-class="{active:chart.active, disabled:chart.disabled}" ng-click="selectChart(chart)">
+                <img ng-src="{{chart.image}}" style="height:80px;width:120px;" alt="{{chart.title}}" title="{{chart.title}}">
+                <div class="text">{{chart.title}}</div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="charts-content">
+
+<div class="row" ng-show="filters.report && filters.report.visible">
+    <div class="col-md-6">
+        <!-- project -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Report Type:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.report"
+                        ng-options="report.name for report in filters.report.options"
+                        ng-disabled="!filters.report.options.length">
+                </select>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6" ng-show="filters.datefrom && filters.datefrom.visible">
+        <!-- start date -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Date from:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p class="input-group">
+                <input type="text" class="form-control date_picker" datepicker-popup="" ng-model="selected.datefrom"
+                       is-open="datepickers.datefrom.opened" ng-required="true" />
+                <span class="input-group-btn date_pick">
+                    <button type="button" class="btn btn-default" ng-click="datepickers.datefrom.open($event)">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </button>
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.dateto && filters.dateto.visible">
+        <!-- end date -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Date to:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p class="input-group">
+                <input type="text" class="form-control date_picker" datepicker-popup="" ng-model="selected.dateto"
+                       is-open="datepickers.dateto.opened" ng-required="true" />
+                <span class="input-group-btn date_pick">
+                    <button type="button" class="btn btn-default" ng-click="datepickers.dateto.open($event)">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </button>
+                </span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-6" ng-show="filters.customer && filters.customer.visible">
+        <!-- project -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Client:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.customer"
+                        ng-options="customer.name for customer in filters.customer.options"
+                        ng-disabled="!filters.customer.options.length">
+                    <option value="">{{label.customer}}</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.project && filters.project.visible">
+        <!-- project -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Project:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.project"
+                        ng-options="project.name for project in filters.project.options"
+                        ng-disabled="!filters.project.options.length">
+                    <option value="">{{label.project}}</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.study && filters.study.visible">
+        <!-- study -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Study:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.study"
+                        ng-options="study.name for study in filters.study.options"
+                        ng-disabled="!filters.study.options.length">
+                    <option value="">{{label.study}}</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.zone && filters.zone.visible">
+        <!-- study -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Zone:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.zone"
+                        ng-options="zone.name for zone in filters.zone.options"
+                        ng-disabled="!filters.zone.options.length">
+                    <option value="">{{label.zone}}</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.period && filters.period.visible">
+        <!-- study -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Period:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.period"
+                        ng-options="period.name for period in filters.period.options"
+                        ng-disabled="!filters.period.options.length">
+                    <option value="">{{label.period}}</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.beat && filters.beat.visible">
+        <!-- study -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Beat:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.beat"
+                        ng-options="beat.name for beat in filters.beat.options"
+                        ng-disabled="!filters.beat.options.length">
+                    <option value="">{{label.beat}}</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.groupby && filters.groupby.visible">
+        <!-- project -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Compare by:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <p>
+                <select class="form-control" ng-model="selected.groupby"
+                        ng-options="type.title for type in filters.groupby.options"
+                        ng-disabled="!filters.groupby.options.length">
+                    <option value="">{{label.groupby}}</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show="filters.groupby && filters.groupby.visible && selected.groupby.types.length">
+        <!-- study -->
+        <div class="col-md-4 nopadding">
+            <p>
+                <label>Compare:</label>
+            </p>
+        </div>
+        <div class="col-md-8">
+            <div ng-repeat="type in selected.groupby.types">
+                <label class="checkbox2">
+                    <input type="checkbox" name="compareValue" ng-model="type.selected"
+                           ng-change="updateGenerateButton()" ng-if="filters.groupby.multi">
+                           <span class="check"></span>
+                    <input type="radio" name="compareValue" value="{{type.name}}"
+                           ng-model="selected.groupby.value"
+                           ng-change="updateGenerateButton()" ng-if="!filters.groupby.multi">
+                           <span class="radio_button"></span>
+                    {{type.title}}
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gen" ng-show="isReadyToGenerate">
+    <div class="col-md-2" ng-repeat="option in selected.options">
+        <label class="checkbox2">
+            <input type="checkbox" ng-model="option.selected"><span class="check"></span> {{option.title}}
+        </label>
+    </div>
+</div>
+
+<div class="row gen">
+    <div class="col-md-12">
+        <p class="input-group" style="float:left;" ng-show="isReadyToGenerate">
+            <button class="form-control btn-primary" ng-click="generateReport()" ng-hide="inProgress">Generate Report</button>
+            <button class="form-control btn-primary" disabled="disabled" ng-show="inProgress">Loading report...</button>
+        </p>
+        <p style="color:red;float:left;font-size:20px;font-weight:bold;padding:0 20px;">
+            {{message}}
+        </p>
+    </div>
+</div>
+</div>
