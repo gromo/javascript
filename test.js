@@ -25,3 +25,15 @@ function getValueColor(value, limits) {
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
     }
 }
+
+
+function getOrdinalNumber(n) {
+    if (n < 11 || n > 13) {
+        switch (n % 10) {
+            case 1: return n + 'st';
+            case 2: return n + 'nd';
+            case 3: return n + 'rd';
+        }
+    }
+    return n + 'th';
+}
