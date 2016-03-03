@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Tic-Tac-Toe</title>
+        <style type="text/css">
+            .cell {
+                flex: 0 0 50px;
+                font: bold 50px/1 Colibri, Tahoma, sans-serif;
+                height: 50px;
+                text-align: center;
+                text-transform: uppercase;
+            }
+            .grid {
+                border: 1px solid #ccc;
+                display: flex;
+                flex-wrap: wrap;
+                height: 150px;
+                justify-content: space-between;
+                margin: 10px;
+                width: 150px;
+            }
+
+            p {
+                margin: 10px;
+            }            
+        </style>
+    </head>
+    <body>
+        <div id="grid"></div>
+        <p id="output"></p>
+        <p><input type="text" id="input"></p>
+
+
+        <script>
+            var $grid = document.getElementById('grid');
+            var $input = document.getElementById('input');
+            var $output = document.getElementById('output');
+            var grid = ['', '', '', '', '', '', '', '', ''];
+            var gridLines = [
+                [0,1,2], [3,4,5], [6,7,8],
+                [0,3,6], [1,4,7], [2,5,8],
+                [0,4,8], [2,4,6]
+            ];
+            var isStarted = false;
+
+            var ai = '';
+            var user = '';
+
+            $input.addEventListener('change', function () {
+                var value = ($input.value || '').toLowerCase();
+
+                if (value) {
+                    if (!isStarted) {
+                        // expected values: x,y
+                        if (value === 'x' || value === 'y') {
+                            isStarted = true;
+                            ai = (value === 'x') ? 'y' : 'x';
+                            user = value;
+
+                            if (value === 'y') {
+                                setMark(ai, Math.floor(Math.random() * grid.length));
+                                showGrid();
+                            }
+
+                            $output.innerHTML = 'Enter position from 1 to 9';
+                        }
+                    } else {
+                        // expected values: 1-9
+                        value = parseInt(value);
+                        if (value >= 1 && value <= 9) {
+                            var position = value - 1;
+                            if (setMark(user, position)) {
+                                move();
+                            } else {
+                                $output.innerHTML = 'Cannot set ' + user + ' to position ' + (position + 1);
+                            }
+                        }
+                    }
+
+                    $input.value = '';
+                }
+            });
+
+            $output.innerHTML = 'Enter X or Y';
+
+            /**
+             * Get position of empty cell for line with 2 marks
+             * 
+             * @param {type} mark
+             * @returns {int} empty position or -1
+             */
+            function getLineEmptyPosition(mark){
+                for(var i=0; i < gridLines.length; i++){
+                    var emptyPosition = null, m1 = 0, m2 = 0;
+                    for(var j=0; j < gridLines[i].length; j++){
+                        var position = gridLines[i][j];
+                        var value = grid[position];
+                        
+                        if(value !== ai && value !== user){
+                            emptyPosition = position;
+                        } else {
+                            if(value === mark){
+                                m1++;
+                            } else {
+                                m2++;
+                            }
+                        }
+                    }
+                    if(m1 === 2 & m2 === 0){
+                        return emptyPosition;
+                    }
+                }
+                return -1;
+            }
+            function getNextMove(){
+                for(var i=0; i<9; i++){
+                    
+                }
+            }
+            
+            function isGameEnd() {
+                for(var i=0; i < gridLines.length; i++){
+                    var mark = grid[gridLines[i][0]];
+                    if(mark && grid[gridLines[i][0]] === mark && grid[gridLines[i][1]] === mark && grid[gridLines[i][2]] === mark){
+                        console.log('Game is end. Winner ' + mark);
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            function move() {
+                
+                if(isGameEnd()){
+                    showGrid();
+                    $output.innerHTML = 'AI has lost';
+                    return;
+                }
+                
+                var nextPosition = getLineEmptyPosition(ai);
+                if(nextPosition !== -1){
+                    if(setMark(ai, nextPosition) && isGameEnd()){
+                        showGrid();
+                        $output.innerHTML = 'You have lost';
+                        return;
+                    }
+                }
+                
+                nextPosition = getLineEmptyPosition(user);
+                if(nextPosition !== -1){
+                    if(setMark(ai, nextPosition)){
+                        showGrid();
+                        $output.innerHTML = 'Enter position from 1 to 9';
+                        return;
+                    }
+                }
+                
+                do {
+                    var isSet = setMark(ai, Math.floor(Math.random() * grid.length));
+                } while(!isSet);
+                showGrid();
+            }
+            /**
+             * 
+             * @param {string} mark x, y
+             * @param {int} position 0-8
+             * @returns {undefined}
+             */
+            function setMark(mark, position) {
+                if (grid[position]) {
+                    //alert('Cannot set ' + mark + ' to position ' + (position + 1)); 
+                    return false;
+                } else {
+                    grid[position] = mark;
+                    return true;
+                }
+            }
+            function showGrid() {
+                var html = '<div class="grid">';
+                if (grid) {
+                    for (var i = 0; i < 9; i++) {
+                        html += '<div class="cell">' + (grid[i] || '') + '</div>';
+                    }
+                }
+                html += '</div>';
+                $grid.innerHTML = html;
+            }
+        </script>
+    </body>
+</html>
