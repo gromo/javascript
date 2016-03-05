@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Parsing Formula: Straight Way</title>
+        <style type="text/css">
+            p {
+                margin: 10px 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <p id="output"></p>
+        <p>
+            <input type="text" id="input">
+            <button id="button">Process</button>
+        </p>
+
+        <script>
+            var $button = document.getElementById('button');
+            var $input = document.getElementById('input');
+            var $output = document.getElementById('output');
+
+            $button.addEventListener('click', function () {
+                var value = ($input.value || '').toLowerCase();
+                if (value) {
+                    value = parseString(value);
+                    console.log("value: ", value);
+
+                    var parts = getParts(value);
+                    console.log(parts);
+
+                    var result = getResult(parts);
+                    console.log(result);
+                }
+            });
+
+            function getParts(p) {
+
+                var done = false;
+                var part = null;
+                var parts = [];
+                var prev = null;
+
+                while (p.length) {
+                    part = p.shift();
+                    switch (part) {
+                        case '+':
+                        case '-':
+                        case '*':
+                        case '/':
+                            parts.push(part);
+                            break;
+                        case '(':
+                            parts.push(getParts(p));
+                            break;
+                        case ')':
+                            done = true;
+                            break;
+                        default:
+                            parts.push(part);
+                    }
+                    prev = part;
+
+                    if (done) {
+                        break;
+                    }
+                }
+
+                // wrap all * or / into brackets
+                if (isPartsShouldBeChanged(parts)) {
+                    parts = getChangedParts(parts);
+                }
+
+                return parts;
+
+                
+                function getChangedParts(parts){
+                    
+                    var isArray = false;
+                    var newParts = [];
+                    var value = null;
+                    
+                    for (var i = 0; i < parts.length; i++) {
+                        value = parts[i];
+                        
+                        if ((value === '*' || value === '/') && !isArray) {
+                            isArray = true;
+                            newParts[newParts.length - 1] = [newParts[newParts.length - 1]];
+                        }
+                        
+                        if (value === '+' || value === '-') {
+                            isArray = false;
+                        }
+                        
+                        if(isArray){
+                            newParts[newParts.length - 1].push(value);
+                        } else {
+                            newParts.push(value);
+                        }
+                    }
+                    
+                    return newParts;
+                }
+                function isPartsShouldBeChanged(parts) {
+                    var hasPlusMinus = false;
+                    var hasMultyDiv = false;
+
+                    for (var i = 0; i < parts.length; i++) {
+                        if (parts[i] === '+' || parts[i] === '-') {
+                            hasPlusMinus = true;
+                        }
+                        if (parts[i] === '*' || parts[i] === '/') {
+                            hasMultyDiv = true;
+                        }
+                    }
+
+                    if (hasPlusMinus && hasMultyDiv) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+            function getResult(p) {
+
+                var operation = null;
+                var result = null;
+                var value = null;
+
+                for (var i = 0; i < p.length; i++) {
+                    value = p[i];
+                    switch (value) {
+                        case '+':
+                        case '-':
+                        case '*':
+                        case '/':
+                            operation = p[i];
+                            break;
+                        case '(':
+                        case ')':
+                            break;
+                        default:
+                            if (Array.isArray(value)) {
+                                value = getResult(value);
+                            } else {
+                                value = parseFloat(value);
+                            }
+                            if (!operation) {
+                                result = value;
+                            } else {
+                                switch (operation) {
+                                    case '+':
+                                        result = result + value;
+                                        break;
+                                    case '-':
+                                        result = result - value;
+                                        break;
+                                    case '*':
+                                        result = result * value;
+                                        break;
+                                    case '/':
+                                        result = result / value;
+                                        break;
+                                }
+                            }
+                    }
+                }
+
+                return result;
+            }
+
+            function parseString(s) {
+
+                s = s.replace(/\s+/g, '');
+
+                var part = '';
+                var parts = [];
+                var prev = '';
+                var value = '';
+
+                for (var i = 0; i < s.length; i++) {
+                    value = s[i];
+                    switch (value) {
+                        case '+':
+                        case '*':
+                        case '/':
+                        case '(':
+                        case ')':
+                            if (part) {
+                                parts.push(part);
+                                part = '';
+                            }
+                            parts.push(value);
+                            break;
+                        case '-':
+                            if (part) {
+                                parts.push(part);
+                                part = '';
+                                parts.push(value);
+                            } else {
+                                if (prev === '+' || prev === '-' || prev === '*'
+                                        || prev === '/' || prev === '(') {
+                                    part = value;
+                                } else {
+                                    parts.push(value);
+                                }
+                            }
+                            break;
+                        default:
+                            part = part + value;
+                    }
+                    prev = value;
+                }
+                if (part) {
+                    parts.push(part);
+                }
+                return parts;
+            }
+        </script>
+    </body>
+</html>
