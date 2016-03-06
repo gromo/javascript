@@ -119,11 +119,6 @@
                                 output.push(operator);
                                 operator = operators.pop();
                             }
-
-                            operator = operators.length && operators[operators.length - 1] || null;
-                            if (operator && (operator === '+' || operator === '-' || operator === '*' || operator === '/')) {
-                                output.push(operators.pop());
-                            }
                             break;
                         default:
                             output.push(value);
