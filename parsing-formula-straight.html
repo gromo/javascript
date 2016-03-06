@@ -198,8 +198,13 @@
                                 part = '';
                                 parts.push(value);
                             } else {
-                                if (prev === '+' || prev === '-' || prev === '*'
-                                        || prev === '/' || prev === '(') {
+                                if (i === 0
+                                        || prev === '+'
+                                        || prev === '-'
+                                        || prev === '*'
+                                        || prev === '/'
+                                        || prev === '('
+                                        ) {
                                     part = value;
                                 } else {
                                     parts.push(value);
