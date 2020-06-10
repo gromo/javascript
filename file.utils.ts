@@ -13,3 +13,23 @@ export function convertFileToDataUrl(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+  /**
+   * Save file to temp directory, so it can be opened with `openFileWithSystem`
+   *
+   * @param {File} file
+   * @return {string} path to temp file or null if errors
+   */
+  async saveToTemp(file: File): Promise<string> {
+    try {
+      if (!await this.ionicFile.checkDir(this.ionicFile.cacheDirectory, 'temp')) {
+        await this.ionicFile.createDir(this.ionicFile.cacheDirectory, 'temp', false);
+      }
+      const filename = 'tmp_' + new Date().getTime();
+      await this.ionicFile.writeFile(this.ionicFile.cacheDirectory + 'temp/', filename, file);
+      return this.ionicFile.cacheDirectory + 'temp/' + filename;
+    } catch (e) {
+      console.log('Error saving file to temp directory', e);
+      return null;
+    }
+  }
