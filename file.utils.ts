@@ -33,3 +33,10 @@ export function convertFileToDataUrl(file: File): Promise<string> {
       return null;
     }
   }
+
+  private async removeTempFiles() {
+    try {
+      await this.ionicFile.removeRecursively(this.ionicFile.cacheDirectory, 'temp');
+    } catch (e) {
+    }
+  }
